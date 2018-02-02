@@ -1,0 +1,23 @@
+# Learn more about services, parameters and containers at
+# https://symfony.com/doc/current/service_container.html
+parameters:
+    #parameter_name: value
+
+services:
+    app.request_logger:
+        class: AppBundle\Service\RequestLogger
+        arguments: ["@doctrine.orm.entity_manager", "@mailer", "@templating", "%mailer_sender_request_reports%"]
+
+    app.request_logger_listener:
+        class: AppBundle\EventListener\RequestLogSubscriber
+        arguments:
+            ['@app.request_logger', "@security.authorization_checker"]
+        tags:
+            - { name: kernel.event_subscriber }
+
+    app.report_request_log_command:
+        class: AppBundle\Command\ReportRequestLogCommand
+        arguments:
+            - '@app.request_logger'
+        tags:
+            -  { name: console.command }

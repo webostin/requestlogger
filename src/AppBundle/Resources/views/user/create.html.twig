@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+    <div id="user-create">
+        This is user create
+    </div>
+
+    <div>
+
+        {{ form_start(form) }}
+        {{ form_widget(form) }}
+
+        <button type="submit">
+            Add
+        </button>
+
+        {{ form_end(form) }}
+
+    </div>
+
+{% endblock %}
