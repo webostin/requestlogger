@@ -6,6 +6,7 @@ namespace AppBundle\Service;
 
 use AppBundle\Entity\RequestLog;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 
 class RequestLogger
@@ -66,7 +67,8 @@ class RequestLogger
     {
         $queryParams = $request->query->all();
         $requestParams = $request->request->all();
-        $files = $request->files->all();
+        $filesBag = $request->files->all();
+        $files = $this->filesToArray($filesBag);
         $httpReferer = $request->headers->get('referer');
 
         $requestLog = new RequestLog();
@@ -93,5 +95,30 @@ class RequestLogger
 
         $this->em->persist($requestLog);
         $this->em->flush();
+    }
+
+    protected function filesToArray($bag): array
+    {
+        $files = [];
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveArrayIterator(
+                $bag,
+                \RecursiveArrayIterator::CHILD_ARRAYS_ONLY
+            )
+        );
+        foreach ($iterator as $element) {
+            if ($element instanceof UploadedFile) {
+                $files[] = $this->fileToArray($element);
+            }
+        }
+        return $files;
+    }
+
+    protected function fileToArray(UploadedFile $file): array
+    {
+        return [
+            'original_name' => $file->getClientOriginalName(),
+            'tmp_name' => $file->getFilename(),
+        ];
     }
 }
