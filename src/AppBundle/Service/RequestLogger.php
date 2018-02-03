@@ -89,7 +89,7 @@ class RequestLogger
         }
 
         $requestLog->setSessionId($request->getSession()->getId())
-            ->setUrlRequest($request->getRequestUri())
+            ->setUrlRequest($request->getScheme() . '://' . $request->getHttpHost() .$request->getRequestUri())
             ->setIpAddress($request->getClientIp())
             ->setHttpMethod($request->getMethod());
 
